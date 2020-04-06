@@ -1,0 +1,121 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define pb push_back
+#define pii pair<int,int>
+#define pli pair<long long int,int>
+#define pbi pair<bool,int>
+#define pob pop_back
+#define all(a) a.begin(),a.end()
+#define fio ios_base::sync_with_stdio(false); cin.tie(0);cout.tie(0);
+#define i64 long long int
+#define mem(x,y) memset(x,y,sizeof(x))
+#define fill(arr,b) fill(arr, arr+sizeof(arr)/sizeof(arr[0]), b)
+#define maxarr(n,arr,m) m =-1e9;for(int i=0;i<n;i++)if(arr[i]>m) m=arr[i];
+
+const double pi = acos(-1.0);
+const int maxn = (i64)2e9+5;
+
+struct info{
+    int rem[3],prop;
+} tree[300005];
+
+int cnt;
+void swap(int &a , int &b , int &c)
+{
+    int tmp = c;
+    c=b;b=a;a=tmp;
+}
+void build(int node, int b, int e)
+{
+    if(b==e)
+    {
+        tree[node].rem[0] = 1;
+        return;
+    }
+    int m = (b+e)/2;
+    build(node<<1,b,m);
+    build((node<<1)+1,m+1,e);
+    tree[node].rem[0] = tree[node<<1].rem[0]+tree[(node<<1)+1].rem[0];
+}
+void update(int node, int b, int e, int i,int j)
+{
+    if(tree[node].prop>0)
+    {
+        int tmp=tree[node].prop%3;
+        while(tmp--)
+        {
+            swap(tree[node].rem[0],tree[node].rem[1],tree[node].rem[2]);
+        }
+        if(b!=e)
+        {
+            tree[node<<1].prop += tree[node].prop;
+            tree[(node<<1)+1].prop += tree[node].prop;
+        }
+        tree[node].prop = 0;
+    }
+    if(b>j || e<i) return ;
+    else if(b>=i && e<=j)
+    {
+        swap(tree[node].rem[0],tree[node].rem[1],tree[node].rem[2]);
+        if(b!=e)
+        {
+            tree[node<<1].prop++;
+            tree[(node<<1)+1].prop++;
+        }
+        return ;
+    }
+    int m = (b+e)/2;
+    update(node<<1,b,m,i,j);
+    update((node<<1)+1,m+1,e,i,j);
+    for(int i = 0 ; i<=2 && b!=e ; i++)
+    {
+        tree[node].rem[i] = tree[node<<1].rem[i] + tree[(node<<1)+1].rem[i];
+    }
+}
+
+int query(int node, int b , int e, int i , int j)
+{
+    if(tree[node].prop>0)
+    {
+        int tmp=tree[node].prop%3;
+        while(tmp--)
+        {
+            swap(tree[node].rem[0],tree[node].rem[1],tree[node].rem[2]);
+        }
+        if(b!=e)
+        {
+            tree[node<<1].prop += tree[node].prop;
+            tree[(node<<1)+1].prop += tree[node].prop;
+        }
+        tree[node].prop = 0;
+    }
+    if(b>j || e<i) return 0;
+    else if(b>=i && e<=j) return tree[node].rem[0];
+    int m = (b+e)/2;
+    int ans1 = query(node<<1,b,m,i,j);
+    int ans2 = query((node<<1)+1,m+1,e,i,j);
+    return ans1+ans2;
+
+}
+int main()
+{
+    //freopen("input.txt","r",stdin);
+    int n,q;
+    scanf("%d%d",&n,&q);
+    build(1,0,n-1);
+    while(q--)
+    {
+        int i,a,b;
+        scanf("%d%d%d",&i,&a,&b);
+        if(i==0)
+        {
+            update(1,0,n-1,a,b);
+        }
+        else
+        {
+            int cnt = query(1,0,n-1,a,b);
+            printf("%d\n",cnt);
+        }
+    }
+    return 0;
+}
