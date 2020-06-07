@@ -1,0 +1,35 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+#define N 1000000
+
+int d[N+5];
+vector<int> p[N+5];
+void sieve()
+{
+    for(int i=1;i<=N;i++)
+        for(int j=i;j<=N;j+=i) d[j]++;
+
+    for(int i=2;i<=N;i++)
+        if(p[i].size()==0)
+        {
+            for(int j=i;j<=N;j+=i) p[j].push_back(i);
+        }
+}
+
+int main()
+{
+    int n,cnt=0;
+    sieve();
+    for(int i=1;i<=N;i++)
+    {
+        int x=d[i];
+        if(p[x].size()==2&&p[x][0]*p[x][1]==x)
+        {
+            cnt++;
+            if(cnt%9==0)
+                printf("%d\n",i);
+        }
+    }
+return 0;
+}
